@@ -1,10 +1,10 @@
 # Solar System Wallpaper
 
-A CLI tool that renders beautiful solar system wallpapers using real ephemeris data from NASA's JPL Horizons system. Specify a date and time, and it fetches actual planetary positions, then renders the scene with Cairo to produce a high-resolution PNG wallpaper. Also supports timelapse video generation with bulk API fetching and ffmpeg encoding.
+A CLI tool that renders solar system wallpapers using real ephemeris data from NASA's JPL Horizons system. Specify a date and time, and it fetches the planetary positions, then renders the scene with Cairo to produce a high-resolution PNG wallpaper. Also supports timelapse video generation with bulk API fetching and ffmpeg encoding.
 
 ## Prerequisites
 
-### System Dependencies
+### System dependencies
 
 **macOS:**
 ```bash
@@ -30,7 +30,7 @@ cd solar-system-wallpaper
 uv sync
 ```
 
-## Quick Start
+## Quick start
 
 Render a wallpaper for right now:
 ```bash
@@ -47,7 +47,7 @@ uv run solar-system-wallpaper render --date "2024-07-20 16:17:00" --output wallp
 uv run solar-system-wallpaper render --date now --width 3840 --height 2160 --output 4k.png
 ```
 
-## CLI Reference
+## CLI reference
 
 ### `render` -- Render a single wallpaper image
 
@@ -109,7 +109,7 @@ Weekly timelapse over 5 years:
 uv run solar-system-wallpaper timelapse --start "2020-01-01" --days 1825 --speed 7d/frame --fps 24 --output 5years.mp4
 ```
 
-## Body Categories
+## Body categories
 
 | Filter name | Description | Count |
 |-------------|-------------|-------|
@@ -122,7 +122,7 @@ uv run solar-system-wallpaper timelapse --start "2020-01-01" --days 1825 --speed
 
 Total: 69 objects (61 bodies + 8 planets).
 
-## How It Works
+## How it works
 
 1. **Ephemeris data** is fetched from [NASA's JPL Horizons](https://ssd.jpl.nasa.gov/horizons/) API. Each body's heliocentric ecliptic position (x, y, z in AU) and velocity (vx, vy, vz in AU/day) are retrieved.
 
@@ -132,7 +132,7 @@ Total: 69 objects (61 bodies + 8 planets).
 
 4. **Timelapse mode** performs one bulk JPL Horizons API call per body for the entire date range (instead of per-frame), then renders each frame sequentially, and finally encodes to video using ffmpeg.
 
-### JPL Horizons Rate Limiting
+### JPL Horizons rate limiting
 
 The tool respects JPL Horizons rate limits:
 - 0.3 second delay between requests
@@ -141,7 +141,7 @@ The tool respects JPL Horizons rate limits:
 
 ## Development
 
-### Type Checking
+### Type checking
 
 This project uses [pyright](https://github.com/microsoft/pyright) in strict mode:
 
