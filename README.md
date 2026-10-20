@@ -1,12 +1,10 @@
 # Solar System Wallpaper
 
-A CLI tool that renders solar system wallpapers from real ephemeris data. Give it a date and time and it fetches planetary positions from NASA's JPL Horizons system, then draws the scene with Cairo to a high-resolution PNG. It can also generate timelapse videos, using bulk API fetches and ffmpeg encoding.
+A CLI that renders the solar system for a given date and time as a PNG or timelapse video.
 
 ## Prerequisites
 
-Requires Python 3.11 or later. We recommend [uv](https://docs.astral.sh/uv/) as the package manager.
-
-Install Cairo, and ffmpeg if you want timelapse videos.
+You need Python 3.11 or later and Cairo. The commands below use [uv](https://docs.astral.sh/uv/).
 
 On macOS:
 
@@ -32,19 +30,19 @@ uv sync
 
 ## Quick start
 
-Render a wallpaper for the current time:
+Current time:
 
 ```bash
 uv run solar-system-wallpaper render --date now --output wallpaper.png
 ```
 
-Render for a specific date:
+Specific date:
 
 ```bash
 uv run solar-system-wallpaper render --date "2024-07-20 16:17:00" --output wallpaper.png
 ```
 
-Render at 4K resolution:
+4K resolution:
 
 ```bash
 uv run solar-system-wallpaper render --date now --width 3840 --height 2160 --output 4k.png
@@ -54,7 +52,7 @@ uv run solar-system-wallpaper render --date now --width 3840 --height 2160 --out
 
 ### `render`
 
-Renders a single wallpaper image.
+Renders one image.
 
 ```
 solar-system-wallpaper render [OPTIONS]
@@ -96,25 +94,25 @@ solar-system-wallpaper timelapse [OPTIONS]
 
 ### Examples
 
-Render only planets and dwarf planets:
+Planets and dwarf planets only:
 
 ```bash
 uv run solar-system-wallpaper render --date now --bodies planets,dwarf_planets --output minimal.png
 ```
 
-Render without cosmetic effects or labels:
+No cosmetic effects or labels:
 
 ```bash
 uv run solar-system-wallpaper render --date now --no-cosmetic --no-labels --output clean.png
 ```
 
-Generate a one-year timelapse at one frame per day:
+One-year timelapse at one frame per day:
 
 ```bash
 uv run solar-system-wallpaper timelapse --start "2024-01-01" --days 365 --speed 1d/frame --output year.mp4
 ```
 
-Generate a 5-year timelapse at one frame per week:
+5-year timelapse at one frame per week:
 
 ```bash
 uv run solar-system-wallpaper timelapse --start "2020-01-01" --days 1825 --speed 7d/frame --fps 24 --output 5years.mp4
@@ -135,17 +133,15 @@ Total: 69 objects (61 bodies + 8 planets).
 
 ## Rendering pipeline
 
-The tool fetches each body's heliocentric ecliptic position (x, y, z in AU) and velocity (vx, vy, vz in AU/day) from the [NASA JPL Horizons](https://ssd.jpl.nasa.gov/horizons/) API.
+Each body's heliocentric ecliptic position (x, y, z in AU) and velocity (vx, vy, vz in AU/day) come from [NASA JPL Horizons](https://ssd.jpl.nasa.gov/horizons/). A power-law radial scale, `r_px = max_r_px * (r_au / max_au)^0.4`, spreads out Mercury through Mars and keeps Pluto on screen.
 
-Positions map to the screen with power-law radial scaling, `r_px = max_r_px * (r_au / max_au)^0.4`. This stretches the inner solar system so Mercury through Mars are clearly visible while Pluto still fits on screen.
+[PyCairo](https://pycairo.readthedocs.io/) draws the layers back to front: milky way, nebulae, twinkling star field, shooting stars, distance grid, asteroid/Kuiper belts, orbit rings, the Sun with animated corona, and all bodies. Planets are drawn as gradient spheres, spacecraft as diamonds, and comets with tails.
 
-[PyCairo](https://pycairo.readthedocs.io/) draws the layers back to front: milky way band, nebulae, star field with twinkling, shooting stars, distance grid, asteroid/Kuiper belts, orbit rings, the Sun with animated corona, and all celestial bodies. Each category has its own style, such as gradient spheres for planets, diamonds for spacecraft, and tails for comets.
-
-Timelapse mode makes one bulk JPL Horizons API call per body for the whole date range instead of one per frame. It then renders each frame in sequence and encodes the video with ffmpeg.
+The `timelapse` command fetches each body's full date range in one API call and encodes the frames with ffmpeg.
 
 ### JPL Horizons rate limiting
 
-The tool waits 0.3 seconds between requests and retries each object up to 2 times on failure. Spacecraft have limited ephemeris coverage windows, so when the full range is unavailable the tool falls back to a narrower date range.
+The CLI waits 0.3 seconds between requests and retries a failed body request up to 2 times. If a spacecraft's ephemeris does not cover the requested date range, it requests a narrower one.
 
 ## Development
 
@@ -169,4 +165,4 @@ uv run python -m solar_system_wallpaper render --date now --output test.png
 
 ## License
 
-MIT License. See [LICENSE](LICENSE) for details.
+MIT. See [LICENSE](LICENSE).
